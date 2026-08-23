@@ -38,7 +38,7 @@ function liveEgoDirective(gesture: HazardAction, scenario: string) {
   }[gesture];
   // Scene is a fixed anchor shared by all three gestures, so only the ACTION
   // changes between them. Action leads, because that is what must differ.
-  return `${action} ${SCENE} ${scenario || ""} ${CAMERA}`;
+  return `AERIAL DRONE SHOT, filmed from a drone flying high above a highway and looking down at the road from behind the vehicles. ${action} ${SCENE} ${scenario || ""} ${CAMERA}`;
 }
 
 const SCENE =
@@ -771,12 +771,12 @@ function TrafficPredictionCanvas({ action, hazard }: { action: string; hazard: H
     if (!canvas) return;
     const context = canvas.getContext("2d");
     if (!context) return;
-    // Longitudinal model. Both speeds are clamped at or above zero, so nothing
-    // in the scene can ever travel backwards; the previous version let the ego
-    // run off-frame and wrapped the obstacle with a modulo, which read as cars
-    // sliding in reverse. The obstacle profile is what the gesture controls;
-    // the ego profile is its reaction.
+
+    // Longitudinal model. Speeds are clamped at or above zero so nothing in the
+    // scene can travel backwards. The obstacle profile is what the gesture
+    // controls; the ego profile is its reaction.
     const CRUISE = 130;
+    const MAX_GAP = 160;               // metres shown; keeps the readout sane
     const obstacleSpeedAt = (t: number) =>
       hazard === "SUDDEN_STOP" ? Math.max(0, CRUISE - 260 * t)
       : hazard === "CUT_IN" ? CRUISE * 0.45
@@ -786,12 +786,33 @@ function TrafficPredictionCanvas({ action, hazard }: { action: string; hazard: H
       : action === "TURN" ? CRUISE * 0.95
       : CRUISE;
 
+    // Ambient highway traffic in the neighbouring lanes.
+    const traffic = [
+      { lane: -1, offset: 40, speed: 118, colour: "#64748b" },
+      { lane: -1, offset: 200, speed: 126, colour: "#475569" },
+      { lane: 1, offset: 95, speed: 108, colour: "#94a3b8" },
+      { lane: 1, offset: 250, speed: 114, colour: "#64748b" },
+    ];
+    const ambient = traffic.map((v) => ({ ...v, y: v.offset }));
+
     let animation = 0;
     let last = 0;
     let elapsed = 0;
-    let gap = 150;
+    let gap = 120;
     let scroll = 0;
     let lateral = 0;
+
+    const car = (x: number, y: number, w: number, h: number, body: string) => {
+      context.fillStyle = body;
+      context.beginPath();
+      context.roundRect(x - w / 2, y - h, w, h, 5);
+      context.fill();
+      // windscreen band, so the blocks read as vehicles rather than rectangles
+      context.fillStyle = "rgba(255,255,255,0.35)";
+      context.beginPath();
+      context.roundRect(x - w / 2 + 3, y - h + 5, w - 6, h * 0.26, 2);
+      context.fill();
+    };
 
     const draw = (now: number) => {
       const width = canvas.clientWidth || 640;
@@ -807,44 +828,60 @@ function TrafficPredictionCanvas({ action, hazard }: { action: string; hazard: H
 
       const egoSpeed = egoSpeedAt(elapsed);
       const obstacleSpeed = obstacleSpeedAt(elapsed);
-      gap = Math.max(0, gap + (obstacleSpeed - egoSpeed) * dt);
+      gap = Math.min(MAX_GAP, Math.max(0, gap + (obstacleSpeed - egoSpeed) * dt));
       scroll = (scroll + egoSpeed * dt) % 34;
-      const targetLateral = action === "TURN" ? -width * 0.19 : 0;
+      const targetLateral = action === "TURN" ? -width * 0.2 : 0;
       lateral += (targetLateral - lateral) * Math.min(1, dt * 2.2);
 
-      context.fillStyle = "#eef2f7"; context.fillRect(0, 0, width, height);
-      context.fillStyle = "#cbd5e1"; context.fillRect(width * .15, 0, width * .7, height);
+      // road
+      context.fillStyle = "#e2e8f0"; context.fillRect(0, 0, width, height);
+      context.fillStyle = "#cbd5e1"; context.fillRect(width * .1, 0, width * .8, height);
       context.strokeStyle = "#ffffff"; context.lineWidth = 2; context.setLineDash([18, 16]);
-      // Markings flow toward the viewer: the cue that the ego is moving forward.
       context.lineDashOffset = -scroll;
-      [width * .38, width * .62].forEach((x) => {
+      [width * .3, width * .5, width * .7].forEach((x, i) => {
+        if (i === 1) return;                      // centre of the ego lane stays clear
         context.beginPath(); context.moveTo(x, -40); context.lineTo(x, height + 40); context.stroke();
       });
       context.setLineDash([]); context.lineDashOffset = 0;
+      context.strokeStyle = "#94a3b8"; context.lineWidth = 3;
+      [width * .1, width * .9].forEach((x) => {
+        context.beginPath(); context.moveTo(x, 0); context.lineTo(x, height); context.stroke();
+      });
 
-      const egoY = height * .74;
+      const egoY = height * .78;
       const egoX = width * .5 + lateral;
       const obstacleX = width * .5;
-      const obstacleY = egoY - Math.min(height * .62, gap * (height * .0042));
+      const perMetre = (height * .62) / MAX_GAP;
+      const obstacleY = egoY - gap * perMetre;
+
+      // ambient traffic, positioned relative to the ego's own speed
+      ambient.forEach((v) => {
+        v.y += (egoSpeed - v.speed) * dt * perMetre * 0.6;
+        const span = height + 160;
+        if (v.y > height + 80) v.y -= span;
+        if (v.y < -80) v.y += span;
+        car(width * .5 + v.lane * width * .2, v.y, 30, 54, v.colour);
+      });
+
       const contact = gap <= 2 && Math.abs(egoX - obstacleX) < 34;
+      car(obstacleX, obstacleY, 34, 58, obstacleSpeed < 30 ? "#dc2626" : "#ea580c");
+      car(egoX, egoY, 36, 62, "#0f766e");
 
-      context.fillStyle = obstacleSpeed < 30 ? "#dc2626" : "#ea580c";
-      context.fillRect(obstacleX - 18, obstacleY - 62, 36, 62);
-      context.fillStyle = "#0f766e";
-      context.fillRect(egoX - 19, egoY - 68, 38, 68);
+      context.fillStyle = "#0f172a";
+      context.font = "600 11px ui-sans-serif, system-ui, sans-serif";
+      context.fillText(`GAP ${Math.round(gap)} m`, 12, 18);
+      context.fillText(`EGO ${Math.round(egoSpeed * 0.28)} km/h`, 12, 34);
+      context.fillText(`OBST ${Math.round(obstacleSpeed * 0.28)} km/h`, 12, 50);
+      context.fillStyle = "#334155";
+      context.font = "600 9px ui-sans-serif, system-ui, sans-serif";
+      context.fillText("EGO", egoX - 11, egoY + 12);
 
-      context.fillStyle = "#0f172a"; context.font = "600 10px ui-sans-serif, system-ui, sans-serif";
-      context.fillText("EGO", egoX - 12, egoY + 14);
-      context.fillText("OBSTACLE", obstacleX - 32, obstacleY - 70);
-      context.fillText(`GAP ${gap.toFixed(0)}m`, 12, 18);
-      context.fillText(`EGO ${(egoSpeed * 0.28).toFixed(0)} km/h`, 12, 32);
-      context.fillText(`OBST ${(obstacleSpeed * 0.28).toFixed(0)} km/h`, 12, 46);
-
-      context.fillStyle = contact ? "rgba(220,38,38,.22)" : "rgba(16,185,129,.16)";
-      context.beginPath(); context.arc(egoX, egoY - 34, contact ? 54 : 34, 0, Math.PI * 2); context.fill();
+      context.fillStyle = contact ? "rgba(220,38,38,.25)" : "rgba(16,185,129,.16)";
+      context.beginPath(); context.arc(egoX, egoY - 31, contact ? 50 : 32, 0, Math.PI * 2); context.fill();
       if (contact) {
         context.fillStyle = "#b91c1c";
-        context.fillText("CONTACT", egoX - 24, egoY - 82);
+        context.font = "700 11px ui-sans-serif, system-ui, sans-serif";
+        context.fillText("CONTACT", egoX - 27, egoY - 74);
       }
 
       animation = requestAnimationFrame(draw);
@@ -867,16 +904,11 @@ function CounterfactualPreview({ action, hazard }: { action: string; hazard?: Ha
     <div className="absolute inset-0 overflow-hidden bg-slate-100">
       <TrafficPredictionCanvas action={action} hazard={hazard ?? "SUDDEN_STOP"} />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent" />
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full">
-        <path d={settings.path} fill="none" stroke={settings.color} strokeWidth="1.3" strokeDasharray="3 2" />
-        <circle cx={action === "TURN" ? "30" : "50"} cy={action === "CONTINUE" ? "42" : "55"} r="3" fill={settings.color} fillOpacity="0.85" />
-        {action === "CONTINUE" && <circle cx="50" cy="42" r="7" fill="none" stroke="#ef4444" strokeWidth="0.8" />}
-      </svg>
-      <div className="absolute right-3 top-3 rounded border px-2 py-1 text-xs font-bold tracking-widest" style={{ borderColor: settings.color, color: settings.color, backgroundColor: "rgba(2,6,23,0.78)" }}>
-        PREDICTED PATH
+      <div className="absolute right-3 top-3 rounded border bg-white/90 px-2 py-1 text-[10px] font-bold tracking-wide" style={{ borderColor: settings.color, color: settings.color }}>
+        {settings.label}
       </div>
-      <div className="absolute bottom-3 left-3 rounded border border-cyan-300 bg-white/90 px-2 py-1 text-xs font-bold tracking-widest text-cyan-700">
-        {settings.label} · DETERMINISTIC SAFETY FORECAST
+      <div className="absolute bottom-3 right-3 rounded border border-cyan-300 bg-white/90 px-2 py-1 text-[10px] font-bold tracking-wide text-cyan-700">
+        DETERMINISTIC FORECAST
       </div>
     </div>
   );
