@@ -22,16 +22,29 @@ type APIResponse = {
 type HazardAction = "CUT_IN" | "SUDDEN_STOP" | "OVERTAKE";
 
 function liveEgoDirective(gesture: HazardAction, scenario: string) {
-  const directive = {
-    SUDDEN_STOP: "IMMEDIATELY, in the very first moment of the clip, the car directly ahead brakes hard and comes to a complete stop. The ego car brakes firmly and stops safely behind it, staying in its own lane. It does not hit the car ahead.",
-    CUT_IN: "IMMEDIATELY, in the very first moment of the clip, the ego car begins overtaking. The car directly ahead is moving slowly and blocking the lane. The ego car steers left into the empty lane, overtakes it, and carries on ahead of it.",
-    OVERTAKE: "From the very first moment of the clip the road ahead is clear and the car ahead holds a steady speed. The ego car just keeps driving straight forward at a constant speed in the same lane.",
+  const action = {
+    SUDDEN_STOP:
+      "ACTION - EMERGENCY BRAKING: The white van ahead switches on bright red brake lights and stops abruptly in the lane. " +
+      "The silver ego car brakes hard IMMEDIATELY: its own brake lights glow bright red, its nose visibly dips down under braking, " +
+      "the gap to the van shrinks, and the ego car comes to a COMPLETE STOP a few car lengths behind the van without touching it. " +
+      "It stays in its own lane and does not change lane.",
+    CUT_IN:
+      "ACTION - OVERTAKE: The white van ahead slows down and blocks the lane. " +
+      "The silver ego car switches on its left indicator, steers out into the empty left lane, drives past the van, " +
+      "and continues forward ahead of it. The van slides backwards past the ego car on the right.",
+    OVERTAKE:
+      "ACTION - CRUISE: The white van ahead keeps a steady speed. " +
+      "The silver ego car simply follows at the same constant speed, holding the same gap. No braking, no lane change, no swerving.",
   }[gesture];
-  // The action leads: it is what must differ between gestures, and models weight
-  // the opening of a prompt most. The camera line is short and comes last so it
-  // cannot drown out the part that changes.
-  return `${directive} ${scenario || "Busy forward-moving city traffic."} ${CAMERA}`;
+  // Scene is a fixed anchor shared by all three gestures, so only the ACTION
+  // changes between them. Action leads, because that is what must differ.
+  return `${action} ${SCENE} ${scenario || ""} ${CAMERA}`;
 }
+
+const SCENE =
+  "SCENE (identical in every version, do not change it): a silver electric sedan is the ego car, driving on a city street in clear daylight. " +
+  "A white delivery van is directly ahead of it in the same lane. Grey asphalt, white lane markings, an empty lane to the left, " +
+  "buildings and parked cars along both sides. Keep the same street, the same two vehicles, the same colours and the same lighting throughout.";
 
 const CAMERA =
   "CAMERA: rigidly mounted to the ego car and tracking it at all times, positioned behind it and slightly raised, looking forward along the road. " +
