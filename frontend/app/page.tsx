@@ -26,7 +26,7 @@ function liveEgoDirective(gesture: HazardAction, scenario: string) {
   // the car - never "drone", "aerial" or "cinematic", which pull it into
   // overhead or film framing. Obstacle kept close, road populated.
   void scenario;
-  const VIEW = "Realistic car driving simulation, camera close behind a silver car on a three-lane highway. ";
+  const VIEW = "Realistic car driving simulation, camera close behind a silver car on a three-lane highway. The camera is fixed to the silver car and moves at exactly the same speed as it, so the silver car stays in the same spot in the frame while the road flows past. ";
   const TRAFFIC = " Several other cars drive nearby in the left and right lanes. Clear daylight.";
   return {
     SUDDEN_STOP:
