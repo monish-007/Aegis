@@ -22,25 +22,27 @@ type APIResponse = {
 type HazardAction = "CUT_IN" | "SUDDEN_STOP" | "OVERTAKE";
 
 function liveEgoDirective(gesture: HazardAction, scenario: string) {
-  // Deliberately short. Helios is a real-time model: a long prompt full of
-  // instructions and negatives gets diluted and it latches onto stray details.
-  // Drone framing first, one clear action, minimal scene. ~230 characters.
+  // Short on purpose: Helios dilutes long prompts. Chase view from just behind
+  // the car - never "drone", "aerial" or "cinematic", which pull it into
+  // overhead or film framing. Obstacle kept close, road populated.
   void scenario;
+  const VIEW = "Realistic car driving simulation, camera close behind a silver car on a three-lane highway. ";
+  const TRAFFIC = " Several other cars drive nearby in the left and right lanes. Clear daylight.";
   return {
     SUDDEN_STOP:
-      "Aerial drone view looking down at a highway from above and behind. A silver car follows a white van in the middle lane. " +
-      "The van brakes hard and stops, and the silver car brakes and stops safely behind it. Other cars drive in the side lanes. Daylight.",
+      VIEW + "A white van is just ahead in the same lane, only two car lengths away. " +
+      "The van brakes hard and stops, and the silver car brakes and stops close behind it." + TRAFFIC,
     CUT_IN:
-      "Aerial drone view looking down at a highway from above and behind. A silver car follows a slow white van in the middle lane. " +
-      "The silver car moves into the empty left lane and overtakes the van. Other cars drive in the side lanes. Daylight.",
+      VIEW + "A slow white van is just ahead in the same lane, only two car lengths away. " +
+      "The silver car pulls into the empty left lane and drives past the van." + TRAFFIC,
     OVERTAKE:
-      "Aerial drone view looking down at a highway from above and behind. A silver car follows a white van in the middle lane at a steady speed, " +
-      "keeping the same distance. Other cars drive in the side lanes. Daylight.",
+      VIEW + "A white van is just ahead in the same lane, two car lengths away. " +
+      "The silver car follows it at the same steady speed, keeping that short gap." + TRAFFIC,
   }[gesture];
 }
 
 const CAMERA =
-  "Aerial drone view looking down at a highway from above and behind, with other cars in the side lanes. Daylight.";
+  "Realistic car driving simulation, camera close behind the silver car on a three-lane highway, the white van just ahead in the same lane a couple of car lengths away, several other cars in the neighbouring lanes. Clear daylight.";
 
 function liveCounterfactuals(hazard: HazardAction, scenario = "busy forward-moving city traffic"): Counterfactual[] {
   // [BRAKE, TURN, CONTINUE]. The highest score must match the branch the live

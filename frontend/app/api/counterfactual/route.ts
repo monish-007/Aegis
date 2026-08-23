@@ -23,13 +23,13 @@ export async function POST(request: NextRequest) {
     const SYSTEM_PROMPT = `You are an AV safety evaluator. The user provides a driving scenario. Evaluate 3 actions: 'BRAKE', 'TURN', and 'CONTINUE'. Return STRICT JSON containing:
 {
   "counterfactuals": [
-    { "action": "BRAKE", "safety_score": 87, "fatalities": false, "visual_prompt": "A photorealistic aerial drone video..." },
-    { "action": "TURN", "safety_score": 52, "fatalities": false, "visual_prompt": "A photorealistic aerial drone video..." },
-    { "action": "CONTINUE", "safety_score": 4, "fatalities": true, "visual_prompt": "A photorealistic aerial drone video..." }
+    { "action": "BRAKE", "safety_score": 87, "fatalities": false, "visual_prompt": "A realistic driving simulation video..." },
+    { "action": "TURN", "safety_score": 52, "fatalities": false, "visual_prompt": "A realistic driving simulation video..." },
+    { "action": "CONTINUE", "safety_score": 4, "fatalities": true, "visual_prompt": "A realistic driving simulation video..." }
   ],
   "voiceover_summary": "Optimal path identified: Threshold Braking. Swerving results in a rollover. Maintaining course results in critical impact."
 }
-Each visual_prompt must describe PHOTOREALISTIC AERIAL DRONE footage of a three-lane highway with surrounding traffic. The drone hovers above and slightly behind the two vehicles, looking down at about a 40-degree angle, flying along at the same speed so that BOTH the silver ego car and the white van ahead of it stay centred in frame at all times with the gap between them visible. Neither vehicle ever leaves the shot. The drone holds a steady fixed angle. Keep the wording plain and factual. No rotation, no orbiting, no zoom, no tilting, no cinematic wording, no slow motion, no camera effects.
+Each visual_prompt must describe a realistic car driving simulation seen from a camera close behind the silver ego car on a three-lane highway, with the white van just ahead in the same lane only a couple of car lengths away, and several other cars in the neighbouring lanes. Keep the wording short, plain and factual. Never use the words drone, aerial or cinematic. No camera moves, no zoom, no slow motion, no camera effects.
 Return ONLY the JSON object, no markdown fences, no explanation.`;
 
     let result;
@@ -86,19 +86,19 @@ Return ONLY the JSON object, no markdown fences, no explanation.`;
             action: "BRAKE",
             safety_score: 87,
             fatalities: false,
-            visual_prompt: `A photorealistic aerial drone video of a car braking hard on a dry three-lane highway. ${s}... The car's brake lights glow red, its nose dips under heavy deceleration, and the gap to the van closes. The car stops safely with meters of clearance. Aerial drone shot above and slightly behind the vehicles at about a 40-degree angle, flying along with the traffic so the silver ego car and the white van ahead both stay centred in frame with the gap visible. Steady fixed angle, three-lane highway with surrounding traffic, realistic daylight.`,
+            visual_prompt: `A realistic driving simulation video of a car braking hard on a dry three-lane highway. ${s}... The car's brake lights glow red, its nose dips under heavy deceleration, and the gap to the van closes. The car stops safely with meters of clearance. Camera close behind the silver car, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
           },
           {
             action: "TURN",
             safety_score: 52,
             fatalities: false,
-            visual_prompt: `A photorealistic aerial drone video of a car changing lane to the left on a dry three-lane highway. ${s}... The car moves smoothly into the clear left lane and passes the van. Aerial drone shot above and slightly behind the vehicles at about a 40-degree angle, flying along with the traffic so the silver ego car and the white van ahead both stay centred in frame with the gap visible. Steady fixed angle, three-lane highway with surrounding traffic, realistic daylight.`,
+            visual_prompt: `A realistic driving simulation video of a car changing lane to the left on a dry three-lane highway. ${s}... The car moves smoothly into the clear left lane and passes the van. Camera close behind the silver car, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
           },
           {
             action: "CONTINUE",
             safety_score: 4,
             fatalities: true,
-            visual_prompt: `A photorealistic aerial drone video of a car maintaining course with zero deceleration, resulting in a frontal collision. ${s}... The gap closes rapidly, the vehicle ahead fills the windshield, and the cars make contact. Aerial drone shot above and slightly behind the vehicles at about a 40-degree angle, flying along with the traffic so the silver ego car and the white van ahead both stay centred in frame with the gap visible. Steady fixed angle, three-lane highway with surrounding traffic, realistic daylight.`,
+            visual_prompt: `A realistic driving simulation video of a car maintaining course with zero deceleration, resulting in a frontal collision. ${s}... The gap closes rapidly, the vehicle ahead fills the windshield, and the cars make contact. Camera close behind the silver car, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
           },
         ],
         voiceover_summary:
