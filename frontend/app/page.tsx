@@ -22,26 +22,17 @@ type APIResponse = {
 type HazardAction = "CUT_IN" | "SUDDEN_STOP" | "OVERTAKE";
 
 function liveEgoDirective(gesture: HazardAction, scenario: string) {
-  // The camera rides with the ego, so the ego is static relative to the frame
-  // and "the car brakes" is invisible. Deceleration has to be described by what
-  // the viewer can actually see: brake lights, and the road and scenery slowing
-  // their rush past the camera until everything is still.
+  // Near-telegraphic on purpose. Helios is a live stream: long descriptive
+  // prompts were producing identical generic driving in all three branches.
+  // These are the shortest, most divergent phrasings possible.
   void scenario;
-  const VIEW =
-    "Realistic driving simulation seen from just behind a silver car on a busy three-lane highway. " +
-    "The camera stays right behind the silver car and moves with it. ";
-  const TRAFFIC = " Other cars are driving in the lanes on both sides. Clear daylight.";
   return {
     SUDDEN_STOP:
-      VIEW + "At first the road rushes past quickly. Then the white van two car lengths ahead switches on bright red brake lights and stops dead. " +
-      "The silver car's own brake lights come on, the road and the white lane markings rushing past the camera SLOW RIGHT DOWN and come to a complete standstill, " +
-      "and the silver car ends up stopped just behind the van. The side lanes are busy so there is no room to swerve." + TRAFFIC,
+      "Car braking hard to a stop. Brake lights on. Road slowing to a standstill. White van stopped just ahead. Busy highway.",
     CUT_IN:
-      VIEW + "The road rushes past steadily. The white van two car lengths ahead slows down, so the silver car swings left into the clear left lane, " +
-      "the whole view shifts sideways to the left as it changes lane, and the van slides backwards past the right side of the camera." + TRAFFIC,
+      "Car changing lane to the left and overtaking. View swings left. White van passing by on the right. Busy highway.",
     OVERTAKE:
-      VIEW + "The road rushes past at a constant steady rate that never changes. The white van stays two car lengths ahead the whole time " +
-      "and the gap never grows or shrinks. No braking and no lane change." + TRAFFIC,
+      "Car cruising at constant speed. White van stays the same distance ahead. Nothing changes. Busy highway.",
   }[gesture];
 }
 
