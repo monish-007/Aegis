@@ -22,40 +22,25 @@ type APIResponse = {
 type HazardAction = "CUT_IN" | "SUDDEN_STOP" | "OVERTAKE";
 
 function liveEgoDirective(gesture: HazardAction, scenario: string) {
-  const action = {
+  // Deliberately short. Helios is a real-time model: a long prompt full of
+  // instructions and negatives gets diluted and it latches onto stray details.
+  // Drone framing first, one clear action, minimal scene. ~230 characters.
+  void scenario;
+  return {
     SUDDEN_STOP:
-      "ACTION - EMERGENCY BRAKING: The white van ahead switches on bright red brake lights and stops abruptly in the lane. " +
-      "The silver ego car brakes hard IMMEDIATELY: its own brake lights glow bright red, its nose visibly dips down under braking, " +
-      "the gap to the van shrinks, and the ego car comes to a COMPLETE STOP a few car lengths behind the van without touching it. " +
-      "It stays in its own lane and does not change lane.",
+      "Aerial drone view looking down at a highway from above and behind. A silver car follows a white van in the middle lane. " +
+      "The van brakes hard and stops, and the silver car brakes and stops safely behind it. Other cars drive in the side lanes. Daylight.",
     CUT_IN:
-      "ACTION - OVERTAKE: The white van ahead slows down and blocks the lane. " +
-      "The silver ego car switches on its left indicator, steers out into the empty left lane, drives past the van, " +
-      "and continues forward ahead of it. The van slides backwards past the ego car on the right.",
+      "Aerial drone view looking down at a highway from above and behind. A silver car follows a slow white van in the middle lane. " +
+      "The silver car moves into the empty left lane and overtakes the van. Other cars drive in the side lanes. Daylight.",
     OVERTAKE:
-      "ACTION - CRUISE: The white van ahead keeps a steady speed. " +
-      "The silver ego car simply follows at the same constant speed, holding the same gap. No braking, no lane change, no swerving.",
+      "Aerial drone view looking down at a highway from above and behind. A silver car follows a white van in the middle lane at a steady speed, " +
+      "keeping the same distance. Other cars drive in the side lanes. Daylight.",
   }[gesture];
-  // Scene is a fixed anchor shared by all three gestures, so only the ACTION
-  // changes between them. Action leads, because that is what must differ.
-  return `AERIAL DRONE SHOT, filmed from a drone flying high above a highway and looking down at the road from behind the vehicles. ${action} ${SCENE} ${scenario || ""} ${CAMERA}`;
 }
 
-const SCENE =
-  "SCENE (identical in every version, do not change it): a three-lane highway in clear daylight with light surrounding traffic. " +
-  "A silver electric sedan is the ego car, travelling in the middle lane. A white delivery van is directly ahead of it in the same middle lane. " +
-  "Other cars and a lorry travel in the left and right lanes and further up the road, all moving forward in the same direction. " +
-  "Grey asphalt, white lane markings, crash barriers and green verges along both sides. " +
-  "Keep the same highway, the same silver ego car and white van, the same surrounding traffic, the same colours and the same lighting throughout.";
-
 const CAMERA =
-  "CAMERA: a DRONE shot filmed from the air, hovering above and slightly behind the two vehicles and looking down at the road at roughly a 40-degree angle. " +
-  "The drone FLIES ALONG WITH the traffic at the same speed and keeps BOTH the silver ego car and the white van ahead of it centred in the frame at all times. " +
-  "Neither vehicle ever leaves the shot, drifts out of frame or shrinks into the distance - both stay clearly visible, together, in every single frame, " +
-  "with the gap between them always visible so the viewer can see the distance opening or closing. " +
-  "Framed wide enough to also show the neighbouring lanes and surrounding traffic. " +
-  "The drone holds a steady, level, fixed angle - no rotation, no orbiting, no zooming, no tilting, no cinematic moves. " +
-  "Photorealistic aerial footage, normal real-time speed, a short 5-second clip with no empty lead-in. No slow motion, no reversing.";
+  "Aerial drone view looking down at a highway from above and behind, with other cars in the side lanes. Daylight.";
 
 function liveCounterfactuals(hazard: HazardAction, scenario = "busy forward-moving city traffic"): Counterfactual[] {
   // [BRAKE, TURN, CONTINUE]. The highest score must match the branch the live
