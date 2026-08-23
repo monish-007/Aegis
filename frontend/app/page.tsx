@@ -22,24 +22,26 @@ type APIResponse = {
 type HazardAction = "CUT_IN" | "SUDDEN_STOP" | "OVERTAKE";
 
 function liveEgoDirective(gesture: HazardAction, scenario: string) {
-  // Two beats: traffic flowing normally, THEN the obstacle acts and the ego
-  // reacts. The road being busy is what makes braking the only option, so it
-  // is stated in the brake case. Kept short - long prompts get diluted.
+  // The camera rides with the ego, so the ego is static relative to the frame
+  // and "the car brakes" is invisible. Deceleration has to be described by what
+  // the viewer can actually see: brake lights, and the road and scenery slowing
+  // their rush past the camera until everything is still.
   void scenario;
   const VIEW =
     "Realistic driving simulation seen from just behind a silver car on a busy three-lane highway. " +
-    "The camera stays right behind the silver car and moves with it, so the car keeps the same place in the frame. ";
+    "The camera stays right behind the silver car and moves with it. ";
   const TRAFFIC = " Other cars are driving in the lanes on both sides. Clear daylight.";
   return {
     SUDDEN_STOP:
-      VIEW + "Traffic is flowing normally, then the white van two car lengths ahead SUDDENLY brakes hard and stops. " +
-      "The lanes on both sides are busy with other cars, so there is no room to swerve and the silver car brakes hard and stops close behind the van." + TRAFFIC,
+      VIEW + "At first the road rushes past quickly. Then the white van two car lengths ahead switches on bright red brake lights and stops dead. " +
+      "The silver car's own brake lights come on, the road and the white lane markings rushing past the camera SLOW RIGHT DOWN and come to a complete standstill, " +
+      "and the silver car ends up stopped just behind the van. The side lanes are busy so there is no room to swerve." + TRAFFIC,
     CUT_IN:
-      VIEW + "Traffic is flowing normally, then the white van two car lengths ahead slows right down. " +
-      "The left lane is clear, so the silver car pulls into the left lane and drives past the van." + TRAFFIC,
+      VIEW + "The road rushes past steadily. The white van two car lengths ahead slows down, so the silver car swings left into the clear left lane, " +
+      "the whole view shifts sideways to the left as it changes lane, and the van slides backwards past the right side of the camera." + TRAFFIC,
     OVERTAKE:
-      VIEW + "Traffic is flowing normally and the white van two car lengths ahead keeps a steady speed, " +
-      "so the silver car simply follows it at the same speed, keeping the same short gap." + TRAFFIC,
+      VIEW + "The road rushes past at a constant steady rate that never changes. The white van stays two car lengths ahead the whole time " +
+      "and the gap never grows or shrinks. No braking and no lane change." + TRAFFIC,
   }[gesture];
 }
 
