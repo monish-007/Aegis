@@ -22,17 +22,17 @@ type APIResponse = {
 type HazardAction = "CUT_IN" | "SUDDEN_STOP" | "OVERTAKE";
 
 function liveEgoDirective(gesture: HazardAction, scenario: string) {
-  // Near-telegraphic on purpose. Helios is a live stream: long descriptive
-  // prompts were producing identical generic driving in all three branches.
-  // These are the shortest, most divergent phrasings possible.
+  // Short, but the vehicles must be named first - a purely telegraphic prompt
+  // produced an empty road with no cars in it at all.
   void scenario;
+  const ROAD = "Busy three-lane highway seen from behind a silver car, with a white van just ahead in the same lane and several other cars in the side lanes. ";
   return {
     SUDDEN_STOP:
-      "Car braking hard to a stop. Brake lights on. Road slowing to a standstill. White van stopped just ahead. Busy highway.",
+      ROAD + "The van brakes and stops. The silver car brakes hard, brake lights on, and the road slows to a standstill.",
     CUT_IN:
-      "Car changing lane to the left and overtaking. View swings left. White van passing by on the right. Busy highway.",
+      ROAD + "The van slows, so the silver car moves left into the clear lane and drives past it. The van slips by on the right.",
     OVERTAKE:
-      "Car cruising at constant speed. White van stays the same distance ahead. Nothing changes. Busy highway.",
+      ROAD + "Everything keeps a steady speed and the gap to the van never changes.",
   }[gesture];
 }
 
@@ -810,7 +810,12 @@ function TrafficPredictionCanvas({ action, hazard }: { action: string; hazard: H
 
       const egoSpeed = egoSpeedAt(elapsed);
       const obstacleSpeed = obstacleSpeedAt(elapsed);
-      gap = Math.min(MAX_GAP, Math.max(0, gap + (obstacleSpeed - egoSpeed) * dt));
+      // Once the ego has actually moved out of the lane it may pass the obstacle,
+      // so the gap is allowed to go negative and the obstacle is then drawn
+      // behind the ego. Clamping at 0 stacked the two cars on the same spot.
+      const clearedLane = Math.abs(lateral) > width * 0.1;
+      const floor = clearedLane ? -70 : 0;
+      gap = Math.min(MAX_GAP, Math.max(floor, gap + (obstacleSpeed - egoSpeed) * dt));
       scroll = (scroll + egoSpeed * dt) % 34;
       const targetLateral = action === "TURN" ? -width * 0.2 : 0;
       lateral += (targetLateral - lateral) * Math.min(1, dt * 2.2);
@@ -845,7 +850,7 @@ function TrafficPredictionCanvas({ action, hazard }: { action: string; hazard: H
         car(width * .5 + v.lane * width * .2, v.y, 30, 54, v.colour);
       });
 
-      const contact = gap <= 2 && Math.abs(egoX - obstacleX) < 34;
+      const contact = gap <= 2 && gap >= -2 && Math.abs(egoX - obstacleX) < 34;
       car(obstacleX, obstacleY, 34, 58, obstacleSpeed < 30 ? "#dc2626" : "#ea580c");
       car(egoX, egoY, 36, 62, "#0f766e");
 
