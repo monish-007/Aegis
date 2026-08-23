@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   ],
   "voiceover_summary": "Optimal path identified: Threshold Braking. Swerving results in a rollover. Maintaining course results in critical impact."
 }
-Each visual_prompt must describe a realistic car driving simulation seen from a camera close behind the silver ego car on a three-lane highway, the camera fixed to that car and moving at exactly its speed so the car holds the same spot in frame while the road flows past, with the white van just ahead in the same lane only a couple of car lengths away, and several other cars in the neighbouring lanes. Keep the wording short, plain and factual. Never use the words drone, aerial or cinematic. No camera moves, no zoom, no slow motion, no camera effects.
+Each visual_prompt must read like a realistic driving simulation seen from just behind the silver ego car on a busy three-lane highway, with the camera staying right behind that car and moving with it so it holds the same place in frame. Start with traffic flowing normally, then the event, then how the ego reacts. The white van sits about two car lengths ahead in the same lane, and other cars drive in the lanes on both sides. For BRAKE, say the side lanes are busy so there is no room to swerve. Keep it short, plain and factual. Never use the words drone, aerial or cinematic. No camera moves, no zoom, no slow motion, no camera effects.
 Return ONLY the JSON object, no markdown fences, no explanation.`;
 
     let result;
@@ -86,19 +86,19 @@ Return ONLY the JSON object, no markdown fences, no explanation.`;
             action: "BRAKE",
             safety_score: 87,
             fatalities: false,
-            visual_prompt: `A realistic driving simulation video of a car braking hard on a dry three-lane highway. ${s}... The car's brake lights glow red, its nose dips under heavy deceleration, and the gap to the van closes. The car stops safely with meters of clearance. Camera fixed to the silver car and moving at exactly its speed so it holds the same spot in frame, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
+            visual_prompt: `A realistic driving simulation seen from just behind a silver car on a busy three-lane highway. Traffic is flowing normally, then the white van two car lengths ahead suddenly brakes hard and stops. The side lanes are busy so there is no room to swerve, and the silver car brakes hard and stops close behind it. ${s}... The car's brake lights glow red, its nose dips under heavy deceleration, and the gap to the van closes. The car stops safely with meters of clearance. Camera fixed to the silver car and moving at exactly its speed so it holds the same spot in frame, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
           },
           {
             action: "TURN",
             safety_score: 52,
             fatalities: false,
-            visual_prompt: `A realistic driving simulation video of a car changing lane to the left on a dry three-lane highway. ${s}... The car moves smoothly into the clear left lane and passes the van. Camera fixed to the silver car and moving at exactly its speed so it holds the same spot in frame, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
+            visual_prompt: `A realistic driving simulation seen from just behind a silver car on a busy three-lane highway. Traffic is flowing normally, then the white van two car lengths ahead slows right down. The left lane is clear, so the silver car pulls into it and drives past the van. ${s}... The car moves smoothly into the clear left lane and passes the van. Camera fixed to the silver car and moving at exactly its speed so it holds the same spot in frame, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
           },
           {
             action: "CONTINUE",
             safety_score: 4,
             fatalities: true,
-            visual_prompt: `A realistic driving simulation video of a car maintaining course with zero deceleration, resulting in a frontal collision. ${s}... The gap closes rapidly, the vehicle ahead fills the windshield, and the cars make contact. Camera fixed to the silver car and moving at exactly its speed so it holds the same spot in frame, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
+            visual_prompt: `A realistic driving simulation seen from just behind a silver car on a busy three-lane highway. The white van two car lengths ahead brakes hard, but the silver car does not slow down and the gap closes until the two make contact. ${s}... The gap closes rapidly, the vehicle ahead fills the windshield, and the cars make contact. Camera fixed to the silver car and moving at exactly its speed so it holds the same spot in frame, the white van a couple of car lengths ahead in the same lane, several other cars in the neighbouring lanes. Clear daylight.`,
           },
         ],
         voiceover_summary:

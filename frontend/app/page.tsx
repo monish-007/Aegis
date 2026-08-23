@@ -22,22 +22,24 @@ type APIResponse = {
 type HazardAction = "CUT_IN" | "SUDDEN_STOP" | "OVERTAKE";
 
 function liveEgoDirective(gesture: HazardAction, scenario: string) {
-  // Short on purpose: Helios dilutes long prompts. Chase view from just behind
-  // the car - never "drone", "aerial" or "cinematic", which pull it into
-  // overhead or film framing. Obstacle kept close, road populated.
+  // Two beats: traffic flowing normally, THEN the obstacle acts and the ego
+  // reacts. The road being busy is what makes braking the only option, so it
+  // is stated in the brake case. Kept short - long prompts get diluted.
   void scenario;
-  const VIEW = "Realistic car driving simulation, camera close behind a silver car on a three-lane highway. The camera is fixed to the silver car and moves at exactly the same speed as it, so the silver car stays in the same spot in the frame while the road flows past. ";
-  const TRAFFIC = " Several other cars drive nearby in the left and right lanes. Clear daylight.";
+  const VIEW =
+    "Realistic driving simulation seen from just behind a silver car on a busy three-lane highway. " +
+    "The camera stays right behind the silver car and moves with it, so the car keeps the same place in the frame. ";
+  const TRAFFIC = " Other cars are driving in the lanes on both sides. Clear daylight.";
   return {
     SUDDEN_STOP:
-      VIEW + "A white van is just ahead in the same lane, only two car lengths away. " +
-      "The van brakes hard and stops, and the silver car brakes and stops close behind it." + TRAFFIC,
+      VIEW + "Traffic is flowing normally, then the white van two car lengths ahead SUDDENLY brakes hard and stops. " +
+      "The lanes on both sides are busy with other cars, so there is no room to swerve and the silver car brakes hard and stops close behind the van." + TRAFFIC,
     CUT_IN:
-      VIEW + "A slow white van is just ahead in the same lane, only two car lengths away. " +
-      "The silver car pulls into the empty left lane and drives past the van." + TRAFFIC,
+      VIEW + "Traffic is flowing normally, then the white van two car lengths ahead slows right down. " +
+      "The left lane is clear, so the silver car pulls into the left lane and drives past the van." + TRAFFIC,
     OVERTAKE:
-      VIEW + "A white van is just ahead in the same lane, two car lengths away. " +
-      "The silver car follows it at the same steady speed, keeping that short gap." + TRAFFIC,
+      VIEW + "Traffic is flowing normally and the white van two car lengths ahead keeps a steady speed, " +
+      "so the silver car simply follows it at the same speed, keeping the same short gap." + TRAFFIC,
   }[gesture];
 }
 
