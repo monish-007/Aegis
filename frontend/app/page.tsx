@@ -34,11 +34,13 @@ function liveEgoDirective(gesture: HazardAction, scenario: string) {
 }
 
 const CAMERA =
-  "View from behind and slightly above the ego car, looking forward along the road. " +
-  "Both the ego car and the car ahead stay visible in the frame together. " +
-  "The camera stays locked behind the ego car and moves forward with it. " +
-  "Photorealistic and steady. The whole action happens quickly, within a short 5-second clip - no long calm build-up, no waiting, no empty lead-in before the event. " +
-  "No cinematic angles, no camera rotation, no zoom, no slow motion, no reversing.";
+  "CAMERA: rigidly mounted to the ego car and tracking it at all times, positioned behind it and slightly raised, looking forward along the road. " +
+  "The ego car is FIXED IN THE FRAME - it never moves within the picture, never shrinks into the distance and never leaves the shot. It stays in the lower-centre of the image for the entire clip, filling about a quarter of the frame height, always clearly visible. " +
+  "The obstacle vehicle ahead also stays inside the frame the whole time, so BOTH cars are on screen together in every single frame. " +
+  "Only the road, lane markings, buildings and other traffic move past; the ego car itself holds its position on screen. " +
+  "Wide enough to show the road and surroundings clearly. Photorealistic and steady. " +
+  "The action happens quickly within a short 5-second clip, with no empty lead-in. " +
+  "No cinematic angles, no camera rotation, no zoom, no slow motion, no reversing, and the ego car must never drive out of shot.";
 
 function liveCounterfactuals(hazard: HazardAction, scenario = "busy forward-moving city traffic"): Counterfactual[] {
   const profiles = {

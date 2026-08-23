@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   ],
   "voiceover_summary": "Optimal path identified: Threshold Braking. Swerving results in a rollover. Maintaining course results in critical impact."
 }
-Each visual_prompt must describe PHOTOREALISTIC footage from a camera fixed directly BEHIND and slightly ABOVE the ego vehicle, looking forward along the road, with BOTH the ego vehicle (lower part of frame) and the obstacle vehicle ahead visible at the same time. The camera stays locked behind the ego vehicle. Keep the wording plain and factual. No cinematic or film wording, no camera moves, no orbiting, no zoom, no slow motion, no camera effects, no floating debris.
+Each visual_prompt must describe PHOTOREALISTIC footage from a camera rigidly mounted to the ego car, behind it and slightly raised, tracking it at all times. The ego car is FIXED IN THE FRAME - it never moves within the picture, never shrinks away and never leaves the shot; it stays in the lower-centre of the image for the whole clip. The obstacle vehicle ahead also stays in frame, so both cars are on screen together in every frame. Only the road and surroundings move past. Keep the wording plain and factual. No cinematic wording, no camera rotation, no zoom, no slow motion, no camera effects, and the ego car must never drive out of shot.
 Return ONLY the JSON object, no markdown fences, no explanation.`;
 
     let result;
@@ -86,19 +86,19 @@ Return ONLY the JSON object, no markdown fences, no explanation.`;
             action: "BRAKE",
             safety_score: 87,
             fatalities: false,
-            visual_prompt: `A photorealistic dashcam video of a car executing maximum threshold ABS braking on a wet road. ${s}... The vehicle nose pitches down sharply under heavy deceleration, brake dust rises from the wheels, dark skid marks form on the asphalt. The car stops safely with meters of clearance. Camera fixed behind and slightly above the ego vehicle, looking forward; both the ego car and the vehicle ahead stay visible. Steady locked viewpoint, realistic daylight.`,
+            visual_prompt: `A photorealistic dashcam video of a car executing maximum threshold ABS braking on a wet road. ${s}... The vehicle nose pitches down sharply under heavy deceleration, brake dust rises from the wheels, dark skid marks form on the asphalt. The car stops safely with meters of clearance. Camera rigidly mounted to the ego car, behind and slightly raised, tracking it so the ego car stays fixed in the lower-centre of the frame and never leaves the shot; the vehicle ahead also stays in frame throughout. Realistic daylight.`,
           },
           {
             action: "TURN",
             safety_score: 52,
             fatalities: false,
-            visual_prompt: `A photorealistic dashcam video of a car executing an emergency swerve to the left on a wet road. ${s}... The vehicle leans hard as it changes lane, tire smoke rises from the rear wheels, and it passes close to the guardrail. Near miss. Camera fixed behind and slightly above the ego vehicle, looking forward; both the ego car and the vehicle ahead stay visible. Steady locked viewpoint, realistic daylight.`,
+            visual_prompt: `A photorealistic dashcam video of a car executing an emergency swerve to the left on a wet road. ${s}... The vehicle leans hard as it changes lane, tire smoke rises from the rear wheels, and it passes close to the guardrail. Near miss. Camera rigidly mounted to the ego car, behind and slightly raised, tracking it so the ego car stays fixed in the lower-centre of the frame and never leaves the shot; the vehicle ahead also stays in frame throughout. Realistic daylight.`,
           },
           {
             action: "CONTINUE",
             safety_score: 4,
             fatalities: true,
-            visual_prompt: `A photorealistic dashcam video of a car maintaining course with zero deceleration, resulting in a frontal collision. ${s}... The gap closes rapidly, the vehicle ahead fills the windshield, and the cars make contact. Camera fixed behind and slightly above the ego vehicle, looking forward; both the ego car and the vehicle ahead stay visible. Steady locked viewpoint, realistic daylight.`,
+            visual_prompt: `A photorealistic dashcam video of a car maintaining course with zero deceleration, resulting in a frontal collision. ${s}... The gap closes rapidly, the vehicle ahead fills the windshield, and the cars make contact. Camera rigidly mounted to the ego car, behind and slightly raised, tracking it so the ego car stays fixed in the lower-centre of the frame and never leaves the shot; the vehicle ahead also stays in frame throughout. Realistic daylight.`,
           },
         ],
         voiceover_summary:
