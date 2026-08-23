@@ -56,10 +56,12 @@ const CAMERA =
   "No cinematic angles, no camera rotation, no zoom, no slow motion, no reversing, and the ego car must never drive out of shot.";
 
 function liveCounterfactuals(hazard: HazardAction, scenario = "busy forward-moving city traffic"): Counterfactual[] {
+  // [BRAKE, TURN, CONTINUE]. The highest score must match the branch the live
+  // video switches to, or the RECOMMENDED badge contradicts the video.
   const profiles = {
-    CUT_IN: [91, 64, 7],
-    SUDDEN_STOP: [96, 48, 2],
-    OVERTAKE: [74, 82, 31],
+    CUT_IN: [74, 91, 7],        // slow vehicle ahead, clear lane -> overtake
+    SUDDEN_STOP: [96, 48, 2],   // obstacle stops -> brake
+    OVERTAKE: [71, 78, 90],     // traffic stable -> continue
   }[hazard];
   const subject = {
     CUT_IN: "a nearby vehicle cuts sharply into the ego lane",
