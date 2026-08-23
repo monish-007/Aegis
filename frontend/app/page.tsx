@@ -42,18 +42,20 @@ function liveEgoDirective(gesture: HazardAction, scenario: string) {
 }
 
 const SCENE =
-  "SCENE (identical in every version, do not change it): a silver electric sedan is the ego car, driving on a city street in clear daylight. " +
-  "A white delivery van is directly ahead of it in the same lane. Grey asphalt, white lane markings, an empty lane to the left, " +
-  "buildings and parked cars along both sides. Keep the same street, the same two vehicles, the same colours and the same lighting throughout.";
+  "SCENE (identical in every version, do not change it): a three-lane highway in clear daylight with light surrounding traffic. " +
+  "A silver electric sedan is the ego car, travelling in the middle lane. A white delivery van is directly ahead of it in the same middle lane. " +
+  "Other cars and a lorry travel in the left and right lanes and further up the road, all moving forward in the same direction. " +
+  "Grey asphalt, white lane markings, crash barriers and green verges along both sides. " +
+  "Keep the same highway, the same silver ego car and white van, the same surrounding traffic, the same colours and the same lighting throughout.";
 
 const CAMERA =
-  "CAMERA: rigidly mounted to the ego car and tracking it at all times, positioned behind it and slightly raised, looking forward along the road. " +
-  "The ego car is FIXED IN THE FRAME - it never moves within the picture, never shrinks into the distance and never leaves the shot. It stays in the lower-centre of the image for the entire clip, filling about a quarter of the frame height, always clearly visible. " +
-  "The obstacle vehicle ahead also stays inside the frame the whole time, so BOTH cars are on screen together in every single frame. " +
-  "Only the road, lane markings, buildings and other traffic move past; the ego car itself holds its position on screen. " +
-  "Wide enough to show the road and surroundings clearly. Photorealistic and steady. " +
-  "The action happens quickly within a short 5-second clip, with no empty lead-in. " +
-  "No cinematic angles, no camera rotation, no zoom, no slow motion, no reversing, and the ego car must never drive out of shot.";
+  "CAMERA: a DRONE shot filmed from the air, hovering above and slightly behind the two vehicles and looking down at the road at roughly a 40-degree angle. " +
+  "The drone FLIES ALONG WITH the traffic at the same speed and keeps BOTH the silver ego car and the white van ahead of it centred in the frame at all times. " +
+  "Neither vehicle ever leaves the shot, drifts out of frame or shrinks into the distance - both stay clearly visible, together, in every single frame, " +
+  "with the gap between them always visible so the viewer can see the distance opening or closing. " +
+  "Framed wide enough to also show the neighbouring lanes and surrounding traffic. " +
+  "The drone holds a steady, level, fixed angle - no rotation, no orbiting, no zooming, no tilting, no cinematic moves. " +
+  "Photorealistic aerial footage, normal real-time speed, a short 5-second clip with no empty lead-in. No slow motion, no reversing.";
 
 function liveCounterfactuals(hazard: HazardAction, scenario = "busy forward-moving city traffic"): Counterfactual[] {
   // [BRAKE, TURN, CONTINUE]. The highest score must match the branch the live
