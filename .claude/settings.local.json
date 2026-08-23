@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"page HTTP %{http_code}\\\\n\" http://localhost:3000/ --max-time 20)",
+      "Bash(curl -s -X POST http://localhost:3000/api/reactor --max-time 40 -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:3000/api/cosmos --max-time 20 -w \" HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/audio -H \"Content-Type: application/json\" -d '{\"text\":\"Optimal path identified. Threshold braking.\"}' --max-time 60 -o tts.bin -w \"HTTP %{http_code} bytes=%{size_download} type=%{content_type}\\\\n\")",
+      "Bash(rm -f tts.bin)",
+      "Bash(cd /d/Aegis/frontend && tail -30 /tmp/aegis-dev.log 2>/dev/null | grep -vi \"compiled\\\\|ready in\\\\|next.config\" | tail -15; echo \"--- log end ---\")",
+      "Read(//tmp/**)",
+      "Bash(python -c ' *)",
+      "Bash(curl -s -X POST http://localhost:3000/api/counterfactual -H 'Content-Type: application/json' -d '{\"scenario_description\":\"Ego at 50 km/h in middle lane, white delivery van directly ahead, left lane empty.\"}' --max-time 90 -o r.json -w 'HTTP %{http_code}\\\\n')",
+      "Bash(rm -f r.json)",
+      "Bash(python -)"
+    ]
+  }
+}
